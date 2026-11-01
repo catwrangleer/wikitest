@@ -1,232 +1,230 @@
-:root {
-    --bg-color: #0d1117;
-    --card-bg: #161b22;
-    --text-main: #c9d1d9;
-    --text-muted: #8b949e;
-    --accent: #58a6ff;
-    --accent-strong: #79c0ff;
-    --border-color: #30363d;
-    --highlight: #f7d774;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Games | Wiki Cat</title>
+    <link rel="stylesheet" href="./style.css" type="text/css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Cat Games</h1>
+            <p>Play, purr, and rack up whisker points</p>
+            <nav class="page-nav" aria-label="Main navigation">
+                <a class="nav-button" href="./index.html">Home</a>
+                <a class="nav-button" href="./gallery.html">Cat Gallery</a>
+                <a class="nav-button" href="./videos.html">Cat Videos</a>
+            </nav>
+        </div>
+    </header>
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+    <main class="container">
+        <section class="card">
+            <h2>Cat Clicker Challenge</h2>
+            <p class="score-text">Score: <strong id="score">0</strong></p>
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    padding: 2rem 0;
-}
+            <div class="game-area">
+                <button class="cat-button" type="button" data-points="1" aria-label="Pet the orange cat">
+                    <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=900&q=80" alt="Orange cat">
+                </button>
+                <button class="cat-button" type="button" data-points="2" aria-label="Pet the white cat">
+                    <img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=80" alt="White cat">
+                </button>
+                <button class="cat-button" type="button" data-points="3" aria-label="Pet the gray cat">
+                    <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=80" alt="Gray cat">
+                </button>
+            </div>
 
-img {
-    max-width: 100%;
-    display: block;
-}
+            <div class="game-actions">
+                <button id="reset-game" class="nav-button" type="button">Reset Score</button>
+            </div>
+        </section>
 
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
+        <section class="card mini-game">
+            <h2>Cat Memory Match</h2>
+            <p class="mini-game-copy">Match the cat pairs before time runs out.</p>
+            <div id="memory-board" class="memory-board" aria-live="polite"></div>
+            <div class="game-actions">
+                <button id="reset-memory" class="nav-button" type="button">Shuffle Again</button>
+            </div>
+        </section>
 
-header {
-    margin-bottom: 2rem;
-    text-align: center;
-}
+        <section class="card mini-game">
+            <h2>Whisker Quiz</h2>
+            <p id="quiz-question" class="quiz-question">Question loading...</p>
+            <div id="quiz-options" class="quiz-options" aria-live="polite"></div>
+            <p id="quiz-status" class="quiz-status">Pick the best answer to win points.</p>
+        </section>
+    </main>
 
-header h1 {
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-}
+    <footer>
+        <div class="container">
+            <a href="./index.html">Back to Home</a>
+        </div>
+    </footer>
 
-header p {
-    color: var(--text-muted);
-    font-size: 1.2rem;
-}
+    <script>
+        const scoreElement = document.getElementById('score');
+        const buttons = document.querySelectorAll('.cat-button');
+        const resetButton = document.getElementById('reset-game');
 
-main {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
+        let score = 0;
 
-.card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 2rem;
-}
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
 
-h2 {
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const points = Number(button.dataset.points || 1);
+                score += points;
+                updateScore();
+            });
+        });
 
-.project-list {
-    list-style: none;
-    display: grid;
-    gap: 0.85rem;
-}
+        resetButton.addEventListener('click', () => {
+            score = 0;
+            updateScore();
+        });
 
-.project-list li {
-    border-left: 3px solid var(--accent);
-    padding-left: 1rem;
-}
+        const memoryBoard = document.getElementById('memory-board');
+        const resetMemoryButton = document.getElementById('reset-memory');
+        const memorySymbols = ['🐱', '🐱', '🐈', '🐈', '🐾', '🐾', '😺', '😺'];
+        let memoryCards = [];
+        let revealed = [];
+        let lockBoard = false;
 
-.page-nav {
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-}
+        function shuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
 
-.nav-button,
-.link-button,
-.project-list a {
-    color: var(--accent-strong);
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-}
+        function buildMemoryBoard() {
+            memoryCards = shuffle(memorySymbols);
+            revealed = [];
+            lockBoard = false;
+            memoryBoard.innerHTML = '';
 
-.nav-button,
-.link-button {
-    display: inline-block;
-    background-color: rgba(88, 166, 255, 0.12);
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
-    padding: 0.65rem 1rem;
-    font-weight: 600;
-}
+            memoryCards.forEach((symbol, index) => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'memory-card';
+                card.dataset.symbol = symbol;
+                card.dataset.index = String(index);
+                card.textContent = '❔';
+                card.setAttribute('aria-label', 'Hidden cat memory card');
 
-.nav-button:hover,
-.link-button:hover,
-.project-list a:hover {
-    opacity: 0.85;
-    text-decoration: underline;
-}
+                card.addEventListener('click', () => {
+                    if (lockBoard || revealed.includes(index) || card.classList.contains('matched')) {
+                        return;
+                    }
 
-.gallery-grid,
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem;
-}
+                    card.textContent = symbol;
+                    card.classList.add('flipped');
+                    revealed.push(index);
 
-.gallery-card,
-.video-card {
-    background-color: rgba(13, 17, 23, 0.5);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-}
+                    if (revealed.length === 2) {
+                        const firstIndex = revealed[0];
+                        const secondIndex = revealed[1];
+                        const firstCard = memoryBoard.querySelector(`[data-index="${firstIndex}"]`);
+                        const secondCard = memoryBoard.querySelector(`[data-index="${secondIndex}"]`);
 
-.gallery-card img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-}
+                        if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+                            firstCard.classList.add('matched');
+                            secondCard.classList.add('matched');
+                            score += 5;
+                            updateScore();
+                            revealed = [];
 
-.gallery-card figcaption,
-.video-card .video-meta {
-    padding: 0.9rem 1rem;
-    color: var(--text-main);
-}
+                            if ([...memoryBoard.querySelectorAll('.matched')].length === memoryCards.length) {
+                                const status = document.createElement('p');
+                                status.className = 'memory-win';
+                                status.textContent = 'You matched every cat pair!';
+                                memoryBoard.appendChild(status);
+                            }
+                        } else {
+                            lockBoard = true;
+                            setTimeout(() => {
+                                firstCard.textContent = '❔';
+                                secondCard.textContent = '❔';
+                                firstCard.classList.remove('flipped');
+                                secondCard.classList.remove('flipped');
+                                revealed = [];
+                                lockBoard = false;
+                            }, 700);
+                        }
+                    }
+                });
 
-.video-card iframe {
-    width: 100%;
-    min-height: 220px;
-    border: 0;
-}
+                memoryBoard.appendChild(card);
+            });
+        }
 
-.video-link {
-    display: inline-block;
-    margin-top: 0.75rem;
-    color: var(--accent-strong);
-    text-decoration: none;
-    font-weight: 600;
-}
+        resetMemoryButton.addEventListener('click', buildMemoryBoard);
+        buildMemoryBoard();
 
-.score-text {
-    font-size: 1.15rem;
-    margin-bottom: 1rem;
-}
+        const quizQuestion = document.getElementById('quiz-question');
+        const quizOptions = document.getElementById('quiz-options');
+        const quizStatus = document.getElementById('quiz-status');
 
-.game-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
+        const quizQuestions = [
+            {
+                question: 'Which cat trait is most likely to make a cat feel safe and relaxed?',
+                options: ['A warm nap spot', 'A loud vacuum cleaner', 'A sudden chase', 'A cold floor'],
+                answer: 'A warm nap spot'
+            },
+            {
+                question: 'What is the best description of a cat that keeps slow-blinking at you?',
+                options: ['It is annoyed and ready to attack', 'It is comfortable and trusting you', 'It needs food immediately', 'It is lost'],
+                answer: 'It is comfortable and trusting you'
+            },
+            {
+                question: 'Why do cats often zoom around the house?',
+                options: ['They are hiding a toy', 'They are practicing hunting and play energy', 'They are trying to nap', 'They are waiting for a bath'],
+                answer: 'They are practicing hunting and play energy'
+            }
+        ];
 
-.cat-button {
-    background: none;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
+        let quizIndex = 0;
 
-.cat-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 18px rgba(0,0,0,0.2);
-}
+        function renderQuiz() {
+            const current = quizQuestions[quizIndex];
+            quizQuestion.textContent = current.question;
+            quizOptions.innerHTML = '';
 
-.cat-button img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
+            current.options.forEach((option) => {
+                const optionButton = document.createElement('button');
+                optionButton.type = 'button';
+                optionButton.className = 'quiz-option';
+                optionButton.textContent = option;
+                optionButton.addEventListener('click', () => {
+                    if (option === current.answer) {
+                        score += 10;
+                        quizStatus.textContent = 'Correct! Cats know the best cozy instincts.';
+                        updateScore();
+                    } else {
+                        quizStatus.textContent = `Not quite — the right answer was: ${current.answer}`;
+                    }
 
-.cat-button:focus-visible {
-    outline: 2px solid var(--highlight);
-    outline-offset: 2px;
-}
+                    quizIndex += 1;
+                    if (quizIndex < quizQuestions.length) {
+                        setTimeout(renderQuiz, 800);
+                    } else {
+                        quizQuestion.textContent = 'Quiz complete! You earned whisker points.';
+                        quizOptions.innerHTML = '';
+                        quizStatus.textContent = `Final score: ${score} whisker points.`;
+                    }
+                });
+                quizOptions.appendChild(optionButton);
+            });
+        }
 
-.game-actions {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-footer {
-    text-align: center;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
-}
-
-footer a {
-    color: var(--accent);
-    text-decoration: none;
-    margin: 0 1rem;
-    font-weight: 500;
-}
-
-footer a:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 640px) {
-    body {
-        padding-top: 1rem;
-    }
-
-    .card {
-        padding: 1.25rem;
-    }
-
-    header h1 {
-        font-size: 2rem;
-    }
-}
+        renderQuiz();
+    </script>
+</body>
+</html>
