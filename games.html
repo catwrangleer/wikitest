@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Games | Wiki Cat</title>
+    <link rel="stylesheet" href="./style.css" type="text/css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Cat Games</h1>
+            <p>Click, play, and collect cat points</p>
+            <nav class="page-nav" aria-label="Main navigation">
+                <a class="nav-button" href="./index.html">Home</a>
+                <a class="nav-button" href="./gallery.html">Cat Gallery</a>
+                <a class="nav-button" href="./videos.html">Cat Videos</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Cat Clicker Game</h2>
+            <p class="score-text">Score: <strong id="score">0</strong></p>
+
+            <div class="game-area">
+                <button class="cat-button" type="button" data-points="1" aria-label="Pet the first cat">
+                    <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=900&q=80" alt="Orange cat">
+                </button>
+                <button class="cat-button" type="button" data-points="2" aria-label="Pet the second cat">
+                    <img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=900&q=80" alt="White cat">
+                </button>
+                <button class="cat-button" type="button" data-points="3" aria-label="Pet the third cat">
+                    <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=80" alt="Gray cat">
+                </button>
+            </div>
+
+            <div class="game-actions">
+                <button id="reset-game" class="nav-button" type="button">Reset Score</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <a href="./index.html">Back to Home</a>
+        </div>
+    </footer>
+
+    <script>
+        const scoreElement = document.getElementById('score');
+        const buttons = document.querySelectorAll('.cat-button');
+        const resetButton = document.getElementById('reset-game');
+
+        let score = 0;
+
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const points = Number(button.dataset.points || 1);
+                score += points;
+                updateScore();
+            });
+        });
+
+        resetButton.addEventListener('click', () => {
+            score = 0;
+            updateScore();
+        });
+    </script>
+</body>
+</html>
